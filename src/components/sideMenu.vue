@@ -1,62 +1,41 @@
 <template lang="html">
   <div class="sideWrap" :style="{width: width, top: top}">
-    <el-menu
-      :mode="mode"
-      @select="selectTab"
-      :style="{height: '100%'}"
-      class="el-menu-demo"
-      @open="handleOpen"
-      @close="handleClose"
-      :background-color="`${bgColor || '#4451B0'}`"
-      :text-color="`${textColor || '#fff'}`"
-      :router="false"
-      :unique-opened="true"
-      :active-text-color="activeTextColor"
-      menu-trigger="hover"
-      :default-active="isActive">
-        <el-menu-item v-for="(item, index) in showBars" :key="`${item.path}_${index}`" :index="`${item.path}_${index}`"
-          v-if="!item.children || item.children.length == 0">
-          <router-link v-if="item.path" :to="item.path" class="link-style" :style="setActiveColor(`${item.path}_${index}`)">
-            <i :class="item.icon"></i>
-            <span>{{item.title}}</span>
+    <el-menu :mode="mode" @select="selectTab" :style="{height: '100%'}" class="el-menu-demo" @open="handleOpen" @close="handleClose"
+      :background-color="`${bgColor || '#4451B0'}`" :text-color="`${textColor || '#fff'}`" :router="false"
+      :unique-opened="true" :active-text-color="activeTextColor" menu-trigger="hover" :default-active="isActive">
+      <el-menu-item v-for="(item, index) in showBars" :key="`${item.path}_${index}`" :index="`${item.path}_${index}`"
+        v-if="!item.children || item.children.length == 0">
+        <router-link :to="{path: item.path, query: item.query, params: item.params}" class="link-style" :style="setActiveColor(`${item.path}_${index}`)">
+          <i :class="item.icon"></i>
+          <span>{{item.title}}</span>
+        </router-link>
+      </el-menu-item>
+      <el-submenu :index="`${item.path}_${index}`" v-else>
+        <template slot="title">
+          <i :class="item.icon"></i>
+          <span>{{item.title}}</span>
+        </template>
+        <el-menu-item :index="`${child.path}_${i}`" v-for="(child, i) in item.children" :key="`${child.path}_${i}`">
+          <router-link :to="{path: child.path, query: child.query, params: child.params}" class="link-style" :style="setActiveColor(`${child.path}_${i}`)">
+            <i :class="child.icon"></i>
+            <span>{{child.title}}</span>
           </router-link>
-          <div class="" v-else>
-            <i :class="item.icon"></i>
-            <span>{{item.title}}</span>
-          </div>
         </el-menu-item>
-        <el-submenu :index="`${item.path}_${index}`" v-else>
-          <template slot="title">
-            <i :class="item.icon"></i>
-            <span>{{item.title}}</span>
-          </template>
-          <el-menu-item :index="`${child.path}_${i}`" v-for="(child, i) in item.children" :key="`${child.path}_${i}`">
-            <router-link v-if="child.path" :to="child.path" class="link-style" :style="setActiveColor(`${child.path}_${i}`)">
-              <i :class="child.icon"></i>
-              <span>{{child.title}}</span>
-            </router-link>
-            <div v-else>
-              <i :class="child.icon"></i>
-              <span>{{child.title}}</span>
-            </div>
-          </el-menu-item>
-        </el-submenu>
+      </el-submenu>
     </el-menu>
   </div>
 </template>
 
 <script>
 export default {
-  /*
-    参数说明：
-      width：菜单栏的宽度
-      top：菜单栏到父级元素的顶部距离
-      bars：菜单栏数据
-      defaultActive：默认激活的 tab
-      mode：模式（可选值：horizontal -> 横向；vertical -> 竖向）
-      bgColor：自定义背景色
-      activeTextColor：自定义激活文字颜色
-  */
+  // 参数说明：
+  // width：菜单栏的宽度
+  // top：菜单栏到父级元素的顶部距离
+  // bars：菜单栏数据
+  // defaultActive：默认激活的 tab
+  // mode：模式（可选值：horizontal -> 横向；vertical -> 竖向）
+  // bgColor：自定义背景色
+  // activeTextColor：自定义激活文字颜色
   name: 'sideMenu',
   components: {
 
@@ -71,6 +50,8 @@ export default {
       //   title: '导航一',
       //   icon: 'el-icon-location',
       //   path: '/page_1'
+      //   query: {},
+      //   params: {}
       // }, {
       //   title: '导航二',
       //   icon: 'el-icon-menu',
@@ -192,15 +173,15 @@ export default {
     }
   },
   async created () {
-    // this.userPermission = await this.getGlobalUserPermission()
+    this.userPermission = await this.getGlobalUserPermission()
     this.routeChange()
     this.setMenuShow()
   }
 }
 </script>
 <style media="screen">
-.link-style {
-  color: #fff;
-  display: block;
-}
+  .link-style {
+    color: #fff;
+    display: block;
+  }
 </style>
