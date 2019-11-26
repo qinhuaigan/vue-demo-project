@@ -1,9 +1,11 @@
 <template>
-  <div class="routerTabs">
-    <ul class="tabsList clearfix">
-      <li class="tabItem" @click="go(item, index)" :class="{active: current === index}" v-for="(item, index) in tabs" :key="`${item.path}_${index}`">
+  <div id="routerTabsID" class="routerTabs">
+    <ul id="tabsList" class="tabsList clearfix">
+      <li class="tabItem" @click="go(item, index)" :class="{active: current === index}" v-for="(item, index) in tabs"
+        :key="`${item.path}_${index}`">
         <span>{{item.name}}</span>
         <i class="el-icon-close" v-if="tabs.length > 1 || (tabs.length === 0 && redirect)" @click.stop="closeTab(index)"></i>
+        <div class="activeLine" v-if="current === index"></div>
       </li>
     </ul>
   </div>
@@ -62,12 +64,28 @@ export default {
           }
         }
       }
+      this.setTableListWidth()
     },
     go (item, index) { // 跳转到指定 tab
       this.$router.push({
         path: item.path,
         params: item.path,
         query: item.query
+      })
+    },
+    setTableListWidth () {
+      // 设置 ul 的宽度
+      this.$nextTick(() => {
+        const minWidth = document.getElementById('routerTabsID').clientWidth
+        const tabElment = document.getElementById('tabsList')
+        const tabItemElment = tabElment.getElementsByTagName('li') || []
+        let tabElmentWidth = 0
+        for (let i = 0; i < tabItemElment.length; i++) {
+          tabElmentWidth += (tabItemElment[i].offsetWidth + 1)
+          console.log('tabItemElment[i].offsetWidth ===', tabItemElment[i].offsetWidth)
+        }
+        const setWidth = tabElmentWidth > minWidth ? tabElmentWidth : minWidth
+        tabElment.style.width = `${setWidth}px`
       })
     },
     closeTab (index) {
@@ -103,6 +121,7 @@ export default {
           }
         }
       }
+      this.setTableListWidth()
     }
   },
   created () {
@@ -112,15 +131,48 @@ export default {
 </script>
 
 <style lang="css" scoped>
+  .routerTabs {
+    overflow-x: auto;
+  }
+
+  .tabsList {
+    width: 100%;
+    border-bottom: 1px solid #e4e7ed;
+    /* overflow-x: auto; */
+  }
+
   .tabItem {
     float: left;
-    line-height: 30px;
+    line-height: 35px;
     padding: 0 10px;
     cursor: pointer;
+    border: 1px solid #e4e7ed;
+    border-bottom: none;
+    border-right: none;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .tabItem:first-child {
+    border-top-left-radius: 5px;
+  }
+
+  .tabItem:last-child {
+    border-right: 1px solid #e4e7ed;
+    border-top-right-radius: 5px;
   }
 
   .active {
     color: #409EFF;
-    border-bottom: 1px solid #409EFF;
   }
+
+  .activeLine {
+    height: 1px;
+    width: 100%;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+  }
+
 </style>
