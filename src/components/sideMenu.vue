@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import $ from 'jquery'
 export default {
   // 参数说明：
   // width：菜单栏的宽度
@@ -36,11 +37,12 @@ export default {
   // mode：模式（可选值：horizontal -> 横向；vertical -> 竖向）
   // bgColor：自定义背景色
   // activeTextColor：自定义激活文字颜色
+  // autoLoad：是否自动跳转到第一个可用的页面
   name: 'sideMenu',
   components: {
 
   },
-  props: ['width', 'top', 'bars', 'defaultActive', 'mode', 'bgColor', 'activeTextColor', 'textColor'],
+  props: ['width', 'top', 'bars', 'defaultActive', 'mode', 'bgColor', 'activeTextColor', 'textColor', 'autoLoad'],
   data () {
     return {
       showBars: [],
@@ -52,6 +54,7 @@ export default {
       //   path: '/page_1'
       //   query: {},
       //   params: {}
+      //   permissionArr: [], // 显示该菜单所需要的权限
       // }, {
       //   title: '导航二',
       //   icon: 'el-icon-menu',
@@ -82,6 +85,9 @@ export default {
     },
     routeChange () {
       const that = this
+      if (!that.showBars || that.showBars.length === 0) {
+        this.setMenuShow()
+      }
       // 路由改变时，设置菜单栏的选中项
       const path = that.$route.path
       let stop = false // 用于标记是否停止遍历
@@ -101,16 +107,16 @@ export default {
           }
         }
       }
-      for (let i = 0; that.bars && i < that.bars.length; i++) {
+      for (let i = 0; that.showBars && i < that.showBars.length; i++) {
         if (stop) {
           return
         }
-        if (that.bars[i].path === path) {
+        if (that.showBars[i].path === path) {
           that.isActive = `${path}_${i}`
           stop = true
           break
         } else {
-          ergodicTree(that.bars[i])
+          ergodicTree(that.showBars[i])
         }
       }
     },
@@ -172,14 +178,38 @@ export default {
       return this.showBars
     }
   },
+  mounted () {
+    const h = $(document).height()
+    this.$nextTick(() => {
+      $('.sideWrap').height(`${h - 80}px`)
+    })
+  },
   async created () {
-    this.userPermission = await this.getGlobalUserPermission()
+    this.userPermission = this.globalData.userPermission
     this.routeChange()
     this.setMenuShow()
+    if (this.autoLoad) {
+      // 自动跳转到第一个可用的页面
+      if (this.showBars && this.showBars.length > 0) {
+        if (this.showBars[0].children && this.showBars[0].children.length > 0) {
+          this.$router.push({
+            path: this.showBars[0].children[0].path
+          })
+        } else {
+          this.$router.push({
+            path: this.showBars[0].path
+          })
+        }
+      }
+    }
   }
 }
 </script>
 <style media="screen">
+  .sideWrap {
+    overflow: auto;
+  }
+
   .link-style {
     color: #fff;
     display: block;
