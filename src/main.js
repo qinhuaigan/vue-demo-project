@@ -305,25 +305,6 @@ Vue.prototype.getSMSCode = function (phone, type) {
   })
 }
 
-// 记录访问量
-function recordAccess () {
-  const token = localStorage.getItem('token')
-  axios({
-    method: 'post',
-    url: `/account/account/setVisitData?token=${token}`
-  }).then((response) => {
-    if (response.data.code === 0) {
-
-    } else {
-      Message({
-        type: 'error',
-        message: response.data.msg
-      })
-    }
-  }).catch(() => {})
-}
-recordAccess()
-
 Promise.all([Vue.prototype.getGlobalUserPermission(), Vue.prototype.getUserInfo()]).then((result) => {
   // 保存 "用户权限"
   Vue.prototype.globalData.userPermission = result[0] || []
