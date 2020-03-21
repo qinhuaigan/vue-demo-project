@@ -4,20 +4,20 @@
       :background-color="`${bgColor || '#4451B0'}`" :text-color="`${textColor || '#fff'}`" :router="false"
       :unique-opened="true" :active-text-color="activeTextColor" menu-trigger="hover" :default-active="isActive">
       <el-menu-item v-for="(item, index) in showBars" :key="`${item.path}_${index}`" :index="`${item.path}_${index}`"
-        v-if="!item.children || item.children.length == 0">
+        v-if="!item.children || item.children.length == 0  ">
         <router-link :to="{path: item.path, query: item.query, params: item.params}" class="link-style" :style="setActiveColor(`${item.path}_${index}`)">
-          <i :class="item.icon"></i>
+          <i :class="item.icon" :style="{color: isActive === `${item.path}_${index}` ? activeTextColor : textColor}"></i>
           <span>{{item.title}}</span>
         </router-link>
       </el-menu-item>
       <el-submenu :index="`${item.path}_${index}`" v-else>
         <template slot="title">
-          <i :class="item.icon"></i>
+          <i :class="item.icon" :style="{color: isActive === `${item.path}_${index}` ? activeTextColor : textColor}"></i>
           <span>{{item.title}}</span>
         </template>
-        <el-menu-item :index="`${child.path}_${i}`" v-for="(child, i) in item.children" :key="`${child.path}_${i}`">
+        <el-menu-item :index="`${child.path}_${i}`"  v-for="(child, i) in item.children" :key="`${child.path}_${i}`">
           <router-link :to="{path: child.path, query: child.query, params: child.params}" class="link-style" :style="setActiveColor(`${child.path}_${i}`)">
-            <i :class="child.icon"></i>
+            <i :class="child.icon" :style="{color: isActive === `${child.path}_${i}` ? activeTextColor : textColor}"></i>
             <span>{{child.title}}</span>
           </router-link>
         </el-menu-item>
@@ -42,7 +42,7 @@ export default {
   components: {
 
   },
-  props: ['width', 'top', 'bars', 'defaultActive', 'mode', 'bgColor', 'activeTextColor', 'textColor', 'autoLoad'],
+  props: ['width', 'top', 'bars', 'defaultActive', 'mode', 'bgColor', 'activeTextColor', 'textColor', 'autoLoad', 'icoColor'],
   data () {
     return {
       showBars: [],
@@ -85,6 +85,7 @@ export default {
     },
     routeChange () {
       const that = this
+      this.isActive = null
       if (!that.showBars || that.showBars.length === 0) {
         this.setMenuShow()
       }
@@ -213,5 +214,8 @@ export default {
   .link-style {
     color: #fff;
     display: block;
+  }
+  .icoColor {
+    color:white
   }
 </style>

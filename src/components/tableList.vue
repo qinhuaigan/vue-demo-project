@@ -5,7 +5,7 @@
         slot="empty" stripe :cell-style="setStyle">
         <el-table-column align="center" type="selection" width="55" v-if="multipleShow"></el-table-column>
         <el-table-column align="center" fixed="left" type="index" width="55" label="序号" v-if="!hideNumber"></el-table-column>
-        <el-table-column :align="item.align || 'center'" v-for="(item, i) in titles" :label="item.label" :width="item.width" :key="`${item.prop}_${i}`">
+        <el-table-column :align="item.align || 'center'" v-for="(item, i) in titles" :label="item.label" :width="item.width" :minWidth="item.minWidth" :key="`${item.prop}_${i}`">
           <template slot-scope="scope">
             <el-image v-if="item.type == 'image'" style="width: 100%; height: 100%; vertical-align: middle;" :src="`${fileBaseURL}${scope.row[item.prop]}`"
               :preview-src-list="[`${fileBaseURL}${scope.row[item.prop]}`]">
@@ -17,11 +17,11 @@
           <template slot-scope="scope">
             <div v-if="operateBtnBlock">
               <div :class="{mb5px: i < operateBtns.length - 1}" v-for="(btn, i) in operateBtns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="!scope.row.hiddenBtns || !scope.row.hiddenBtns.includes(i)">
-                <el-button :type="btn.type" size="mini" @click="handleClick(btn.fun, scope.$index, scope.row)">{{btn.text}}</el-button>
+                <el-button :style="{width: btn.width}" :type="btn.type" size="mini" @click="handleClick(btn.fun, scope.$index, scope.row)">{{btn.text}}</el-button>
               </div>
             </div>
             <div v-else>
-              <el-button v-for="(btn, i) in operateBtns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="!scope.row.hiddenBtns || !scope.row.hiddenBtns.includes(i)"
+              <el-button :style="{width: btn.width}" v-for="(btn, i) in operateBtns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="!scope.row.hiddenBtns || !scope.row.hiddenBtns.includes(i)"
                 :type="btn.type" size="mini" @click="handleClick(btn.fun, scope.$index, scope.row)">
                 <span></span>{{btn.text}}
                 </el-button>
@@ -43,14 +43,14 @@ import $ from 'jquery'
 import pagination from './pagination'
 /*
     组件使用说明：
-        1、titles 参数说明：label（表格列名称），prop（表格列填充值参数），width（列的宽度），
+        1、titles 参数说明：label（表格列名称），prop（表格列填充值参数），width（列的宽度），minWidth（列的最小宽度）
            type（内容显示方式，如果显示的内容是图片，则 type = 'image'），align（内容对其方式：center，left，right）
         2、tableData 特定参数说明：style（该参数为 object 类型，可自定义设置该列样式）
            例：style: { pass: 'red'}，'pass' 表示 tableData 数组中，数组元素中的 'pass' 字段的自定义
            样式为 'red'，如果当前组件 tableList 中的 allClass（预设样式）中没有 'red' 样式，则需要添加
            'red' 样式后，方能起效；
            hiddenBtns：传入该数据，可指定当前行隐藏第几个按钮，例：hiddenBtns = [0, 2]，可隐藏 "btns" 中的 第 1，3个按钮
-        3、btns 参数说明（表格组件具备的按钮）：permissionArr（显示该按钮所需拥有的权限数组），text（按钮文字），fun（该按钮所调用的函数），type（按钮的类型，具体参考 elememtUi 的说明）
+        3、btns 参数说明（表格组件具备的按钮）：permissionArr（显示该按钮所需拥有的权限数组），width（按钮宽度），text（按钮文字），fun（该按钮所调用的函数），type（按钮的类型，具体参考 elememtUi 的说明）
            特别强调：在使用该组件时，有 btns 值时，必须设定 handleClick() 函数，具体如下：
            <tableList :tableData="tableData" :titles="titles" :btns="btns" @handleClick="handleClick"></tableList>；
            在使用 <tableList></tableList> 的页面中，添加函数

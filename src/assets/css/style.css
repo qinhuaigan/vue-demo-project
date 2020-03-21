@@ -11,6 +11,7 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
 .margin0px {
   margin: 0 !important;
 }
@@ -100,9 +101,21 @@ a {
 .mt20px {
   margin-top: 20px !important;
 }
+
+.mt40px {
+  margin-top: 40px !important;
+}
+
+.mt50px {
+  margin-top: 50px !important;
+}
+.mt140px {
+  margin-top: 140px !important;
+}
 .mt28px {
   margin-top: 28px !important;
 }
+
 .mb5px {
   margin-bottom: 5px !important;
 }
@@ -117,6 +130,10 @@ a {
 
 .mb20px {
   margin-bottom: 20px !important;
+}
+
+.mb60px {
+  margin-bottom: 60px !important;
 }
 
 .fz12px {
@@ -268,9 +285,15 @@ a {
 }
 
 /* 更改 elemtui table 的默认样式 */
-.has-gutter th, .el-table__fixed-header-wrapper tr th {
-  background: rgba(68, 81, 176, 0.44);
-  color: #000;
+.el-table td,
+.el-table th {
+  padding: 4px 0;
+}
+
+.has-gutter th,
+.el-table__fixed-header-wrapper tr th {
+  background: rgba(68, 81, 176, 0.08);
+  /* color: #47a1fc; */
 }
 
 .content {
@@ -300,16 +323,18 @@ a {
 }
 
 .pageWrap {
-  position:relative;
+  position: relative;
   min-height: 500px;
   background: #fff;
   padding: 20px 50px;
 }
-.positionClass{
+
+.positionClass {
   position: absolute;
   bottom: 25px;
   right: 10%
 }
+
 /* 修改 elementUI 弹框的头部样式 */
 .el-dialog__header .el-dialog__title {
   display: block;
@@ -329,6 +354,78 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.fontcolor{/*提示语:字的颜色*/
-	color: #ff9800;
+
+.fontcolor {
+  /*提示语:字的颜色*/
+  color: #ff9800;
 }
+
+.contain {
+  width: 100%;
+  box-sizing: border-box;
+  display: inline-block;
+  padding: 0 10%;
+}
+
+/* 自定义table样式 */
+.customTable {
+  width: 100%;
+  font-size: 14px;
+  border-spacing: 0;
+  text-align: center;
+  border: 1px solid #EBEEF5;
+  border-bottom: none;
+  border-right: none;
+}
+
+.customTable thead {
+  background: rgba(68, 81, 176, 0.44);
+  color: #000;
+}
+
+.customTable tr th,
+.customTable tr td {
+  padding: 4px 5px;
+  border-right: 1px solid #EBEEF5;
+  border-bottom: 1px solid #EBEEF5;
+  line-height: 23px;
+}
+
+/* 表格背景色 */
+.customTable .customTableColor {
+  background: rgba(68, 81, 176, 0.44);
+}
+
+.tableContent {
+  border: 1px solid #EBEEF5;
+  border-top: none;
+  border-bottom: none;
+  box-sizing: border-box;
+}
+
+/* table表格无数据样式 */
+.emptyIcon {
+  width: 100px;
+  margin: 0 auto;
+  margin-top: 80px;
+  height: auto;
+  content: url(../../assets/img/file.png);
+}
+
+.emptyStyle {
+  line-height: normal;
+  margin-bottom: 50px;
+}
+
+/* 修改 element-ui 的 form 表单组件的间距 */
+  .el-form-item {
+    margin-bottom: 10px;
+  }
+  .el-form--label-top .el-form-item__label {
+    padding: 0;
+  }
+
+/* input框添加外阴影 */
+ .el-input__inner:focus{
+  box-shadow: 0 0 3px 0 #409EFF;
+ }

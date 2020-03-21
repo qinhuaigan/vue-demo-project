@@ -7,15 +7,23 @@ import $ from 'jquery' // 哪个模块需要使用Jquery，就在哪个模块单
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/css/style.css'
+// import './assets/css/animate.css'
+import animated from 'animate.css'
 import globalData from '../utils/globalData.js'
+import store from '../store/index.js'
 
-globalData.token = localStorage.getItem('token')
+globalData.token = localStorage.getItem('token') || ''
+globalData.applicationURL = localStorage.getItem('applicationURL')
 const axios = require('axios')
 const Message = ElementUI.Message
 
-axios.defaults.baseURL = 'http://192.168.2.112/v1/portal' // 本地环境
-Vue.prototype.baseURL = 'http://192.168.2.112/v1/portal' // 本地环境
-Vue.prototype.fileBaseURL = 'http://192.168.2.112/data/access/' // 文件前缀地址（本地环境）
+axios.defaults.baseURL = 'http://192.168.2.140' // 本地环境
+Vue.prototype.baseURL = 'http://192.168.2.140' // 本地环境
+Vue.prototype.fileBaseURL = 'http://192.168.2.140/data/access/' // 本地环境
+
+// axios.defaults.baseURL = '' // 测试和正式环境
+// Vue.prototype.baseURL = '' // 测试
+// Vue.prototype.fileBaseURL = '/data/access/' // 测试和正式环境
 
 Vue.prototype.globalData = globalData
 Vue.prototype.$axios = axios
@@ -23,12 +31,16 @@ Vue.prototype.$querystring = require('querystring')
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)
+Vue.use(animated)
 
 Vue.prototype.Loading = null
 Vue.prototype.showLoading = function (text) {
+  if (typeof text !== 'string') {
+    text = '请稍后...'
+  }
   this.Loading = this.$loading({
     // lock: true,
-    text: `${text || '请稍后'}...`,
+    text,
     background: 'rgba(0, 0, 0, 0.7)'
   })
 }
@@ -104,54 +116,12 @@ Vue.prototype.formatFormData = function (data) {
   const form = new FormData()
   if (data) {
     for (let key in data) {
-      if (data[key] !== undefined || data[key] !== null) {
+      if (data[key] !== undefined && data[key] !== null) {
         form.append(key, data[key])
       }
     }
   }
   return form
-}
-
-// 获取权限之前，需要清除缓存的权限信息
-localStorage.removeItem('authorityList')
-// 获取登录用户所拥有的权限
-Vue.prototype.getGlobalUserPermission = function () {
-  const userPermission = localStorage.getItem('authorityList')
-  if (userPermission) {
-    this.globalData.userPermission = userPermission.split(',')
-    this.globalData.userPermission = this.globalData.userPermission.reduce((total, item) => {
-      total.push(parseFloat(item))
-      return total
-    }, [])
-  }
-  if (this.globalData.userPermission) {
-    return this.globalData.userPermission
-  }
-  if (!this.globalData.token) {
-    return []
-  }
-  return new Promise((resolve) => {
-    axios({
-      method: 'get',
-      url: `/account/getMenuIdsByUserNo?token=${this.globalData.token}`
-    }).then((response) => {
-      if (response.data.code === 0) {
-        this.globalData.userPermission = response.data.data
-        // 添加一个默认所有人都拥有的权限 2（医务科管理），为了给没有权限的账号，在前端首页能显示 "医务科管理" 菜单栏
-        this.globalData.userPermission.push(2)
-        localStorage.setItem('authorityList', this.globalData.userPermission)
-        resolve(this.globalData.userPermission)
-      } else {
-        Message({
-          type: 'error',
-          message: `${response.data.extMsg || response.data.msg}`
-        })
-        resolve([])
-      }
-    }).catch(() => {
-      resolve([])
-    })
-  })
 }
 
 Vue.prototype.formatDate = function (value, type) {
@@ -185,10 +155,191 @@ Vue.prototype.formatDate = function (value, type) {
   return fmt
 }
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  components: { App },
-  template: '<App/>'
+Vue.filter('formatDate', (value, type) => {
+  // 日期格式过滤器
+  if (!value) {
+    return null
+  }
+  const date = new Date(value)
+  let fmt = type || 'yyyy-MM-dd HH:mm:ss'
+  var obj = {
+    'y': date.getFullYear(), // 年份，注意必须用getFullYear
+    'M': date.getMonth() + 1, // 月份，注意是从0-11
+    'd': date.getDate(), // 日期
+    'q': Math.floor((date.getMonth() + 3) / 3), // 季度
+    'w': date.getDay(), // 星期，注意是0-6
+    'H': date.getHours(), // 24小时制
+    'h': date.getHours() % 12 === 0 ? 12 : date.getHours() % 12, // 12小时制
+    'm': date.getMinutes(), // 分钟
+    's': date.getSeconds(), // 秒
+    'S': date.getMilliseconds() // 毫秒
+  }
+  var week = ['天', '一', '二', '三', '四', '五', '六']
+  for (var i in obj) {
+    fmt = fmt.replace(new RegExp(i + '+', 'g'), function (m) {
+      var val = obj[i] + ''
+      if (i === 'w') return (m.length > 2 ? '星期' : '周') + week[val]
+      for (var j = 0, len = val.length; j < m.length - len; j++) val = '0' + val
+      return m.length === 1 ? val : val.substring(val.length - m.length)
+    })
+  }
+  return fmt
+})
+
+// 获取权限之前，需要清除缓存的权限信息
+localStorage.removeItem('authorityList')
+// 获取登录用户所拥有的权限
+Vue.prototype.getGlobalUserPermission = function () {
+  return new Promise((resolve) => {
+    // const userPermission = localStorage.getItem('authorityList')
+    // if (userPermission) {
+    //   Vue.prototype.globalData.userPermission = userPermission.split(',')
+    //   Vue.prototype.globalData.userPermission = Vue.prototype.globalData.userPermission.reduce((total, item) => {
+    //     total.push(parseFloat(item))
+    //     return total
+    //   }, [])
+    //   resolve(Vue.prototype.globalData.userPermission)
+    //   return
+    // }
+    const token = localStorage.getItem('token')
+    if (!token) {
+      resolve([])
+      return
+    }
+    axios({
+      method: 'get',
+      url: `/account/account/getPermissions?token=${token}`
+    }).then((response) => {
+      if (response.data.code === 0) {
+        resolve(response.data.data.prems)
+      } else {
+        if (response.data.code === 400) {
+          // token 已过期, 跳到登录页面
+          localStorage.setItem('loginOverdue', true)
+        }
+        Message({
+          type: 'error',
+          message: `${response.data.msg}`
+        })
+        resolve([])
+      }
+    }).catch(() => {
+      resolve([])
+    })
+  })
+}
+
+Vue.prototype.getUserInfo = function () { // 获取登录用户的信息
+  return new Promise((resolve) => {
+    if (!Vue.prototype.globalData.token) {
+      resolve(false)
+      return
+    }
+    axios({
+      method: 'get',
+      url: `/account/account/getUserByToken?token=${Vue.prototype.globalData.token}`
+    }).then((response) => {
+      if (response.data.code === 0) {
+        store.commit('increment', {
+          name: 'userInfo',
+          value: response.data.data
+        })
+        Vue.prototype.globalData.isLogin = true
+        resolve(response.data.data)
+      } else {
+        Message({
+          type: 'error',
+          message: response.data.msg
+        })
+        store.state.userInfo = null
+        Vue.prototype.globalData.isLogin = false
+        resolve(false)
+      }
+    }).catch(() => {
+      store.state.userInfo = null
+      Vue.prototype.globalData.isLogin = false
+      resolve(false)
+    })
+  })
+}
+
+// 获取验证码
+Vue.prototype.getSMSCode = function (phone, type) {
+  return new Promise((resolve) => {
+    if (!phone) {
+      Message({
+        type: 'warning',
+        message: '请先输入手机号'
+      })
+      resolve(false)
+      return
+    } else if (!(/^1[3456789]\d{9}$/.test(phone))) {
+      Message({
+        type: 'warning',
+        message: '手机号码有误'
+      })
+      resolve(false)
+      return
+    }
+    const data = {
+      phone,
+      type
+    }
+    this.$axios({
+      method: 'get',
+      url: `/account/getVerificationCode?${this.$querystring.stringify(data)}`
+    }).then(function (res) {
+      if (res.data.code === 0) {
+        Message({
+          type: 'success',
+          message: '验证码已发送'
+        })
+        resolve(true)
+      } else {
+        resolve(false)
+        Message.error(res.data.extMsg || res.data.msg)
+      }
+    }).catch(() => {
+      resolve(false)
+    })
+  })
+}
+
+// 记录访问量
+function recordAccess () {
+  const token = localStorage.getItem('token')
+  axios({
+    method: 'post',
+    url: `/account/account/setVisitData?token=${token}`
+  }).then((response) => {
+    if (response.data.code === 0) {
+
+    } else {
+      Message({
+        type: 'error',
+        message: response.data.msg
+      })
+    }
+  }).catch(() => {})
+}
+recordAccess()
+
+Promise.all([Vue.prototype.getGlobalUserPermission(), Vue.prototype.getUserInfo()]).then((result) => {
+  // 保存 "用户权限"
+  Vue.prototype.globalData.userPermission = result[0] || []
+  // 如果是 "游客"，授予默认权限 "企业信息查看/企业认证"
+  if (store.state.userInfo && store.state.userInfo.identity === '游客') {
+    Vue.prototype.globalData.userPermission.push(13, 14)
+  }
+  localStorage.setItem('authorityList', Vue.prototype.globalData.userPermission)
+  /* eslint-disable no-new */
+  new Vue({
+    el: '#app',
+    router,
+    store,
+    components: {
+      App
+    },
+    template: '<App/>'
+  })
 })
