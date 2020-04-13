@@ -10,6 +10,7 @@
             <el-image v-if="item.type == 'image'" style="width: 100%; height: 100%; vertical-align: middle;" :src="`${fileBaseURL}${scope.row[item.prop]}`"
               :preview-src-list="[`${fileBaseURL}${scope.row[item.prop]}`]">
             </el-image>
+            <el-switch v-else-if="item.type == 'switch'" v-model="scope.row[item.prop]" @change="change(scope.row)"></el-switch>
             <div class="customizeDiv cell" :class="{ 'el-tooltip': !showAll}" v-else :style="customizeStyle(scope.row, item.prop)">{{scope.row[item.prop]}}</div>
           </template>
         </el-table-column>
@@ -44,7 +45,7 @@ import pagination from './pagination'
 /*
     组件使用说明：
         1、titles 参数说明：label（表格列名称），prop（表格列填充值参数），width（列的宽度），minWidth（列的最小宽度）
-           type（内容显示方式，如果显示的内容是图片，则 type = 'image'），align（内容对其方式：center，left，right）
+           type（内容显示方式，如果显示的内容是图片，则 type = 'image'；如果现显示的是滑动开关，则 type = "switch"），align（内容对其方式：center，left，right）
         2、tableData 特定参数说明：style（该参数为 object 类型，可自定义设置该列样式）
            例：style: { pass: 'red'}，'pass' 表示 tableData 数组中，数组元素中的 'pass' 字段的自定义
            样式为 'red'，如果当前组件 tableList 中的 allClass（预设样式）中没有 'red' 样式，则需要添加
@@ -116,6 +117,9 @@ export default {
     }
   },
   methods: {
+    change (data) { // 数据更新，如 "switch" 开关的值放生了变化
+      this.$emit('change', data)
+    },
     setOperateBtns () { // 设置可用的按钮，权限挂钩
       this.operateBtns = this.btns ? JSON.parse(JSON.stringify(this.btns)) : []
       for (let i = 0; i < this.operateBtns.length; i++) {
