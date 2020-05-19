@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import {
   Message
 } from 'element-ui'
@@ -11,8 +10,7 @@ Vue.use(Router)
 const router = new Route({
   routes: [{
     path: '/',
-    name: 'HelloWorld',
-    component: HelloWorld
+    name: 'HelloWorld'
   }]
 })
 
