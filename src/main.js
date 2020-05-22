@@ -57,6 +57,24 @@ Vue.prototype.downloadFile = function (url) {
   $form.submit()
 }
 
+/**
+ * 将字节转换成对应的单位
+ * @param {Object} size
+ */
+Vue.prototype.getFileSize = (size) => {
+  if (!size) {
+    return ''
+  }
+
+  var num = 1024.00 // byte
+
+  if (size < num) { return size + 'B' }
+  if (size < Math.pow(num, 2)) { return (size / num).toFixed(2) + 'K' } // kb
+  if (size < Math.pow(num, 3)) { return (size / Math.pow(num, 2)).toFixed(2) + 'M' } // M
+  if (size < Math.pow(num, 4)) { return (size / Math.pow(num, 3)).toFixed(2) + 'G' } // G
+  return (size / Math.pow(num, 4)).toFixed(2) + 'T' // T
+}
+
 Vue.prototype.checkPermissionExist = function (id) {
   // 为了避免 "获取权限请求" 延时，导致按钮显示不出来的问题，添加 Promise() 来处理
   // 验证某权限是否存在，id 是要验证的权限的 id
