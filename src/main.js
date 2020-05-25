@@ -51,10 +51,9 @@ Vue.prototype.hideLoading = function () {
 
 // 下载文件
 Vue.prototype.downloadFile = function (url) {
+  $("<a id='downloadFile' hidden></a>").attr('href', url).appendTo('body')
+  $('#downloadFile')[0].click()
   $('#downloadFile').remove()
-  var $form = $(`<form id='downloadFile' action=${url} method='GET'></form>`)
-  $form.appendTo($('body'))
-  $form.submit()
 }
 
 /**

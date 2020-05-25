@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="sideWrap" :style="{width: width, top: top}">
+  <div id="sideMenu" class="sideWrap" :style="{width: width, top: top}">
     <el-menu :mode="mode" @select="selectTab" :style="{height: '100%'}" class="el-menu-demo" @open="handleOpen" @close="handleClose"
       :background-color="`${bgColor || '#4451B0'}`" :text-color="`${textColor || '#fff'}`" :router="false"
       :unique-opened="true" :active-text-color="activeTextColor" menu-trigger="hover" :default-active="isActive">
@@ -182,7 +182,7 @@ export default {
   mounted () {
     const h = $(document).height()
     this.$nextTick(() => {
-      $('.sideWrap').height(`${h - 80}px`)
+      $('.sideWrap').height(`${h - 60}px`)
     })
   },
   async created () {
@@ -192,11 +192,11 @@ export default {
     if (this.autoLoad) {
       // 自动跳转到第一个可用的页面
       if (this.showBars && this.showBars.length > 0) {
-        if (this.showBars[0].children && this.showBars[0].children.length > 0) {
+        if (this.showBars[0].children && this.showBars[0].children.length > 0 && this.$route.path !== this.showBars[0].children[0].path) {
           this.$router.push({
             path: this.showBars[0].children[0].path
           })
-        } else {
+        } else if (this.$route.path !== this.showBars[0].path) {
           this.$router.push({
             path: this.showBars[0].path
           })
@@ -206,16 +206,26 @@ export default {
   }
 }
 </script>
-<style media="screen">
-  .sideWrap {
+<style>
+  #sideMenu .sideWrap {
     overflow: auto;
   }
 
-  .link-style {
+  #sideMenu .link-style {
     color: #fff;
     display: block;
   }
-  .icoColor {
+  #sideMenu .icoColor {
     color:white
+  }
+
+  #sideMenu .el-menu-item, .el-submenu__title {
+    height: 40px;
+    line-height: 40px;
+  }
+
+  #sideMenu .el-submenu .el-menu-item {
+    height: 40px;
+    line-height: 40px;
   }
 </style>
