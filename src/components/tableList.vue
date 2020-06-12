@@ -14,15 +14,15 @@
             <div class="customizeDiv cell" :class="{ 'el-tooltip': !showAll}" v-else :style="customizeStyle(scope.row, item.prop)">{{scope.row[item.prop]}}</div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" :align="operateBtnAlign || 'left'" fixed="right" :width="operateWidth" v-if="operateBtns && operateBtns.length > 0">
+        <el-table-column label="操作" :align="operateBtnAlign || 'left'" fixed="right" :width="operateWidth" v-if="btns && btns.length > 0">
           <template slot-scope="scope">
             <div v-if="operateBtnBlock">
-              <div :class="{mb5px: i < operateBtns.length - 1}" v-for="(btn, i) in operateBtns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="!scope.row.hiddenBtns || !scope.row.hiddenBtns.includes(i)">
+              <div :class="{mb5px: i < btns.length - 1}" v-for="(btn, i) in btns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="getBtnShow(scope.row.hiddenBtns, btn)">
                 <el-button :style="{width: btn.width}" :type="btn.type" size="mini" @click="handleClick(btn.fun, scope.$index, scope.row)">{{btn.text}}</el-button>
               </div>
             </div>
             <div v-else>
-              <el-button :style="{width: btn.width}" v-for="(btn, i) in operateBtns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="!scope.row.hiddenBtns || !scope.row.hiddenBtns.includes(i)"
+              <el-button :style="{width: btn.width}" v-for="(btn, i) in btns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="getBtnShow(scope.row.hiddenBtns, btn)"
                 :type="btn.type" size="mini" @click="handleClick(btn.fun, scope.$index, scope.row)">
                 <span></span>{{btn.text}}
                 </el-button>
@@ -50,7 +50,7 @@ import pagination from './pagination'
            例：style: { pass: 'red'}，'pass' 表示 tableData 数组中，数组元素中的 'pass' 字段的自定义
            样式为 'red'，如果当前组件 tableList 中的 allClass（预设样式）中没有 'red' 样式，则需要添加
            'red' 样式后，方能起效；
-           hiddenBtns：传入该数据，可指定当前行隐藏第几个按钮，例：hiddenBtns = [0, 2]，可隐藏 "btns" 中的 第 1，3个按钮
+           hiddenBtns：传入该数据，可指定当前行隐藏对应的按钮（按钮名称：text 属性），例：hiddenBtns = ['编辑']，可隐藏 "btns" 中的 "编辑" 按钮
         3、btns 参数说明（表格组件具备的按钮）：permissionArr（显示该按钮所需拥有的权限数组），width（按钮宽度），text（按钮文字），fun（该按钮所调用的函数），type（按钮的类型，具体参考 elememtUi 的说明）
            特别强调：在使用该组件时，有 btns 值时，必须设定 handleClick() 函数，具体如下：
            <tableList :tableData="tableData" :titles="titles" :btns="btns" @handleClick="handleClick"></tableList>；
@@ -111,14 +111,48 @@ export default {
     },
     pageSize (val) {
       this.size = val
-    },
-    btns () {
-      this.setOperateBtns()
     }
+    // btns () {
+    //   this.setOperateBtns()
+    // }
   },
   methods: {
     change (data) { // 数据更新，如 "switch" 开关的值放生了变化
       this.$emit('change', data)
+    },
+    getBtnShow (hiddenBtns, btn) {
+      if (btn.permissionArr && btn.permissionArr.length > 0) {
+        // 该按钮需要相应权限才可显示
+        // 判断当前用户是否有权限使用该 "功能"
+        let check = true // 默认为 true
+        if (this.globalData.userPermission && this.globalData.userPermission.length > 0) {
+          for (let j = 0; j < this.globalData.userPermission.length; j++) {
+            if (btn.permissionArr.includes(this.globalData.userPermission[j])) {
+              check = true
+              break
+            } else if (j === this.globalData.userPermission.length - 1) {
+              // 拥有没有相应权限，该按钮不显示
+              check = false
+              break
+            }
+          }
+        } else {
+          // 该用户一个权限都没有
+          this.operateBtns = this.operateBtns.filter((item) => {
+            return !item.permissionArr || item.permissionArr.length === 0
+          })
+        }
+        if (!check) {
+          return false
+        }
+      }
+
+      // 该按钮在此刻是否需要 "隐藏" （由 hiddenBtns 决定，hiddenBtns 为此刻需要隐藏的按钮）
+      if (hiddenBtns && hiddenBtns.length > 0 && hiddenBtns.includes(btn.text)) {
+        return false
+      } else {
+        return true
+      }
     },
     setOperateBtns () { // 设置可用的按钮，权限挂钩
       this.operateBtns = this.btns ? JSON.parse(JSON.stringify(this.btns)) : []
