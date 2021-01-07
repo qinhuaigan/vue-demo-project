@@ -5,10 +5,10 @@
       :unique-opened="true" :active-text-color="activeTextColor" menu-trigger="hover" :default-active="isActive">
       <el-menu-item v-for="(item, index) in showBars" :key="`${item.path}_${index}`" :index="`${item.path}_${index}`"
         v-if="!item.children || item.children.length == 0  ">
-        <router-link :to="{path: item.path, query: item.query, params: item.params}" class="link-style" :style="setActiveColor(`${item.path}_${index}`)">
+        <div class="link-style" :style="setActiveColor(`${item.path}_${index}`)" @click="openPage(item)">
           <i :class="item.icon" :style="{color: isActive === `${item.path}_${index}` ? activeTextColor : textColor}"></i>
           <span>{{item.title}}</span>
-        </router-link>
+        </div>
       </el-menu-item>
       <el-submenu :index="`${item.path}_${index}`" v-else>
         <template slot="title">
@@ -16,10 +16,10 @@
           <span>{{item.title}}</span>
         </template>
         <el-menu-item :index="`${child.path}_${i}`"  v-for="(child, i) in item.children" :key="`${child.path}_${i}`">
-          <router-link :to="{path: child.path, query: child.query, params: child.params}" class="link-style" :style="setActiveColor(`${child.path}_${i}`)">
+          <div @click="openPage(child)" class="link-style" :style="setActiveColor(`${child.path}_${i}`)">
             <i :class="child.icon" :style="{color: isActive === `${child.path}_${i}` ? activeTextColor : textColor}"></i>
             <span>{{child.title}}</span>
-          </router-link>
+          </div>
         </el-menu-item>
       </el-submenu>
     </el-menu>
@@ -55,6 +55,7 @@ export default {
       //   query: {},
       //   params: {}
       //   permissionArr: [], // 显示该菜单所需要的权限
+      //   target: '' // 页面打开方式（_blank：'新窗口打开'）
       // }, {
       //   title: '导航二',
       //   icon: 'el-icon-menu',
@@ -78,6 +79,19 @@ export default {
     }
   },
   methods: {
+    openPage(row) { // 打开页面
+      if (row.target && row.target === '_blank') {
+        // 新窗口打开
+        const routeUrl = this.$router.resolve({
+          path: row.path,
+          query: row.query,
+          params: row.params
+        })
+        window.open(routeUrl.href, '_blank')
+      } else {
+        this.$router.push({path: row.path, query: row.query, params: row.params})
+      }
+    },
     handleOpen () {},
     handleClose () {},
     selectTab (e) {

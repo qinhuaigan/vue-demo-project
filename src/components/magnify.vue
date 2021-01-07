@@ -1,12 +1,13 @@
 <template>
   <div id="magnify" class="magnify">
     <div class="imgBoxWrap">
-      <div class="preview-box" :style="{'background-image': `url('${previewImg}')`, 'height': `${previewImgHeight}px`}" @mousemove="move($event)"  @mouseout="out" ref="previewBox">
+      <div class="preview-box" :style="{'background-image': `url('${fileBaseURL}${previewImg}')`}"
+        @mousemove="move($event)" @mouseout="out" ref="previewBox">
         <!-- <img width="100%" :src="previewImg" alt=""> -->
         <div class="hover-box" ref="hoverBox"></div>
       </div>
       <div class="zoom-box" v-show="zoomVisiable" ref="zoomBox">
-        <img :src="previewImg" alt="" ref="bigImg">
+        <img :src="`${fileBaseURL}${previewImg}`" alt="" ref="bigImg">
       </div>
     </div>
     <div class="miniBox">
@@ -19,7 +20,8 @@
         <el-col :span="20">
           <div class="miniImageBox" :style="setMiniImageBoxWidth()">
             <ul class="miniImageList clearfix" :style="setMiniImageListStyle()">
-              <li class="miniImageItem" :style="getMiniImageItemStyle(item)" v-for="(item, index) in images" :key="`${item}_${index}`" @mouseenter="changePreviewImg(item)"></li>
+              <li class="miniImageItem" :style="getMiniImageItemStyle(item)" v-for="(item, index) in images" :key="`${item}_${index}`"
+                @mouseenter="changePreviewImg(item)"></li>
             </ul>
           </div>
         </el-col>
@@ -41,7 +43,8 @@
   showNum: 小图片显示个数
 */
 import $ from 'jquery'
-function offset (el) {
+
+function offset(el) {
   let top = el.offsetTop
   let left = el.offsetLeft
   while (el.offsetParent) {
@@ -74,7 +77,7 @@ export default {
       default: 4
     }
   },
-  data () {
+  data() {
     return {
       scrollIndex: 0,
       zoomVisiable: false,
@@ -86,20 +89,20 @@ export default {
     }
   },
   methods: {
-    setMiniImageBoxWidth () {
+    setMiniImageBoxWidth() {
       const percentWidth = $('.miniImageBox').parent('div').width()
       return {
         'width': `${percentWidth}px`
       }
     },
-    setMiniImageListStyle () {
+    setMiniImageListStyle() {
       const percentWidth = $('.miniImageBox').width() || 0
       const w = percentWidth / this.showNum
       return {
         'width': `${w * this.images.length}px`
       }
     },
-    prev () {
+    prev() {
       const percentWidth = $('.miniImageBox').width()
       const w = percentWidth / this.showNum
       if (this.scrollIndex > 0) {
@@ -109,7 +112,7 @@ export default {
         }, 500)
       }
     },
-    next () {
+    next() {
       const percentWidth = $('.miniImageBox').width()
       const w = percentWidth / this.showNum
       if (this.scrollIndex + this.showNum < this.images.length) {
@@ -119,24 +122,24 @@ export default {
         }, 500)
       }
     },
-    changePreviewImg (item) {
+    changePreviewImg(item) {
       this.previewImg = item
     },
-    getMiniImageItemStyle (item) { // 设置 "小图片" 样式
+    getMiniImageItemStyle(item) { // 设置 "小图片" 样式
       const percentWidth = $('.miniImageBox').width()
       const w = percentWidth / this.showNum
       return {
-        'background-image': `url('${item}')`,
+        'background-image': `url('${this.fileBaseURL}${item}')`,
         'width': `${w - 10}px`,
         'margin': '0 5px',
         'border': `${this.previewImg === item ? '1px solid red' : 'none'}`,
         'height': `${this.miniImageHeight}px`
       }
     },
-    out () {
+    out() {
       this.zoomVisiable = false
     },
-    move (ev) {
+    move(ev) {
       this.init()
       // 鼠标距离屏幕距离
       let moveX = ev.clientX
@@ -165,7 +168,7 @@ export default {
       this.$emit('move', ev)
       this.zoomVisiable = true
     },
-    init () {
+    init() {
       this.oHoverBox = this.$refs.hoverBox
       this.oPreviewBox = this.$refs.previewBox
       this.oBigImg = this.$refs.bigImg
@@ -181,7 +184,7 @@ export default {
       this.scroll = document.documentElement.scrollTop || document.body.scrollTop
     }
   },
-  mounted () {
+  mounted() {
     this.$nextTick(() => {
       this.previewImg = this.images[0]
     })
@@ -191,23 +194,31 @@ export default {
 
 <style scoped>
   .imgBoxWrap {
+    width: 100%;
+    position: relative;
+    padding-top: 100%;
+  }
+
+  .magnify {
     position: relative;
   }
 
-.magnify {
-    position: relative;
-  }
   .preview-box {
+    left: 0;
+    top: 0;
     width: 100%;
+    height: 100%;
     border: 1px solid #dededd;
-    position: relative;
+    position: absolute;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
   }
-  .preview-box:hover .hover-box{
+
+  .preview-box:hover .hover-box {
     display: block;
   }
+
   .preview-box .hover-box {
     position: absolute;
     display: none;
@@ -219,6 +230,7 @@ export default {
     user-select: none;
     background-color: rgba(0, 0, 0, 0.2);
   }
+
   .zoom-box {
     width: 100%;
     height: 100%;
@@ -230,6 +242,7 @@ export default {
     z-index: 1000;
     box-sizing: border-box;
   }
+
   .zoom-box img {
     position: absolute;
     top: 0;

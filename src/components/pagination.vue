@@ -5,9 +5,9 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="current"
-      :page-sizes="[5, 10, 20, 100, 200]"
+      :page-sizes="sizeList ? sizeList : [5, 10, 20, 100, 200]"
       :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
+      :layout="getLayout()"
       :total="total"
       :pager-count="5">
     </el-pagination>
@@ -17,7 +17,7 @@
 <script>
 export default {
   name: 'pagination',
-  props: ['pageSize', 'total', 'currentPage'],
+  props: ['pageSize', 'total', 'currentPage', 'hideSizes', 'sizeList'],
   data () {
     return {
       current: this.currentPage || 1,
@@ -33,6 +33,13 @@ export default {
     }
   },
   methods: {
+    getLayout() {
+      if (this.hideSizes) { // 隐藏切换每页显示条数按钮
+        return 'total, prev, pager, next, jumper'
+      } else {
+        return 'total, sizes, prev, pager, next, jumper'
+      }
+    },
     handleSizeChange (val) {
       this.size = val
       this.current = 1

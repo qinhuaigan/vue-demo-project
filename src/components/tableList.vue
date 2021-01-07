@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="clearfix">
     <div class="tableContent">
-      <el-table @selection-change="selectChange" border @select-all="selectAll" @select="selectRow" :data="datas" ref="multipleTable"
+      <el-table @selection-change="selectChange" @select-all="selectAll" @select="selectRow" :data="datas" ref="multipleTable"
         slot="empty" stripe :cell-style="setStyle">
         <el-table-column align="center" type="selection" width="55" v-if="multipleShow"></el-table-column>
         <el-table-column align="center" fixed="left" type="index" width="55" label="序号" v-if="!hideNumber"></el-table-column>
@@ -24,14 +24,13 @@
             <div v-else>
               <el-button :style="{width: btn.width}" v-for="(btn, i) in btns" :key="`${btn.text}_${scope.$index}_${i}`" v-if="getBtnShow(scope.row.hiddenBtns, btn)"
                 :type="btn.type" size="mini" @click="handleClick(btn.fun, scope.$index, scope.row)">
-                <span></span>{{btn.text}}
+                <span>{{btn.text}}</span>
                 </el-button>
             </div>
           </template>
         </el-table-column>
-        <div class="emptyStyle" slot="empty">
-          <div class="emptyIcon"></div>
-          <div class="emptyText mt10px mb20px">无法查找到数据</div>
+        <div slot="empty">
+          <empty></empty>
         </div>
       </el-table>
     </div>
@@ -42,6 +41,7 @@
 <script>
 import $ from 'jquery'
 import pagination from './pagination'
+import empty from './empty.vue'
 /*
     组件使用说明：
         1、titles 参数说明：label（表格列名称），prop（表格列填充值参数），width（列的宽度），minWidth（列的最小宽度）
@@ -81,7 +81,8 @@ export default {
     'showPagination', 'total', 'currentPage', 'pageSize', 'showAll', 'operateBtnBlock', 'operateBtnAlign'
   ],
   components: {
-    pagination
+    pagination,
+    empty
   },
   data () {
     return {
@@ -95,7 +96,8 @@ export default {
         green: 'color:#67C23A',
         red: 'color:red',
         warning: 'color:#E6A23C',
-        brand: 'color:#409EFF'
+        brand: 'color:#409EFF',
+        invalid: 'color:#ccc'
       },
       srcList: []
     }
@@ -343,19 +345,6 @@ export default {
     border-bottom: none;
     box-sizing: border-box;
     position: relative;
-  }
-
-  .emptyIcon {
-    width: 100px;
-    margin: 0 auto;
-    margin-top: 80px;
-    height: auto;
-    content: url(../assets/img/file.png);
-  }
-
-  .emptyStyle {
-    line-height: normal;
-    margin-bottom: 50px;
   }
 
   .fz60px {
