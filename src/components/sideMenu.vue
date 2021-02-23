@@ -89,7 +89,9 @@ export default {
         })
         window.open(routeUrl.href, '_blank')
       } else {
-        this.$router.push({path: row.path, query: row.query, params: row.params})
+        if (this.$route.path !== row.path) {
+          this.$router.push({path: row.path, query: row.query, params: row.params})
+        }
       }
     },
     handleOpen () {},
