@@ -15,6 +15,7 @@ npm install
 4、npm i jquery （安装 jquery，npm 安装地址：https://www.npmjs.com/package/jquery）
 5、npm install vuex --save （安装 vuex，安装地址：https://vuex.vuejs.org/installation.html）
 6、npm install animate.css --save（安装 animate.css，安装地址：https://github.com/daneden/animate.css）
+7、npm install vue-cropper （安装 vue-cropper，安装地址：https://github.com/xyxiao001/vue-cropper）
 
 # serve with hot reload at localhost:8080
 npm run dev
