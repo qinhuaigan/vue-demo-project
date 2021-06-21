@@ -141,6 +141,57 @@ Vue.prototype.formatFormData = function (data) {
   return form
 }
 
+Vue.prototype.$getData = function(url, data) { // get 请求获取后台数据
+  this.showLoading()
+  return new Promise((resolve) => {
+    axios({
+      method: 'get',
+      url: `${url}?token=${globalData.token}`,
+      params: data
+    }).then((response) => {
+      if (response.data.code === 0) {
+        resolve(response.data)
+      } else {
+        Message({
+          type: 'error',
+          message: response.data.msg
+        })
+        resolve(false)
+      }
+      this.hideLoading()
+    }).catch(() => {
+      this.hideLoading()
+      resolve(false)
+    })
+  })
+}
+
+Vue.prototype.$postData = function(url, data, isNotForm) { // post 请求数据
+  // isNotForm：参数提交方式不是 'formdata'
+  return new Promise((resolve) => {
+    this.showLoading()
+    axios({
+      method: 'post',
+      url: `${url}?token=${globalData.token}`,
+      data: isNotForm ? data : this.formatFormData(data)
+    }).then((response) => {
+      if (response.data.code === 0) {
+        resolve(response.data)
+      } else {
+        Message({
+          type: 'error',
+          message: response.data.msg
+        })
+        resolve(false)
+      }
+      this.hideLoading()
+    }).catch(() => {
+      this.hideLoading()
+      resolve(false)
+    })
+  })
+}
+
 Vue.prototype.formatDate = function (value, type) {
   // 日期格式过滤器
   if (!value) {
